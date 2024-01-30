@@ -25,27 +25,74 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Sample Data - Replace with dynamic data from your system -->
-                    <tr>
-                        <td>1</td>
-                        <td>Amit Jha</td>
-                        <td>2</td>
-                        <td>4</td>
-                        <td>KSLKS</td>
-                        <td>500</td>
-                        <td>100</td>
-                        <td>hindi</td>
-                        <td>photo</td>
-                        <td>Advanced mathematics course.</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
+                <tbody id="callingcourse">
+                  
                     <!-- Add more rows as needed -->
                 </tbody>
             </table>
         </div>
     </div>
+
+
+     <script>
+        $(document).ready(function() {
+            let callingcourse = () => {
+                $.ajax({
+                    type: "get",
+                    url: "{{ route('course.index') }}",
+                    success: function(response) {
+
+
+                        let table = $("#callingcourse");
+                        table.empty();
+                        let data = response.data;
+                        //counting courses
+                        let len = data.length;
+                        $("#counting").html(len)
+                        data.forEach((course) => {
+                            table.append(`
+                                <tr>
+                                    <td>${course.id}</td> 
+                                    <td>${course.name}</td>
+                                    <td>${course.category.cat_title}</td> 
+                                    <td>${course.duration}</td>  
+                                    <td>${course.instructor}</td> 
+                                    <td>${course.fees}</td> 
+                                    <td>${course.discount_fees}</td> 
+                                    <td>${course.lang}</td> 
+                                    <td> <img src="/course_image/${course.featured_image}" width="80px" height="50px" alt=""></td> 
+                                    <td>${course.description}</td> 
+    
+                                    <td>
+                                        <button type="button" class="btn btn-danger" id=${"btn"+course.id}>X</button>
+                                        <button type="button" class="btn btn-info" data-id="${course.id}">edit</button>
+                                    </td>
+                                </tr>
+                            `);
+
+                            
+                            //delete Operation 
+                            $("#btn" + course.id).click(function() {
+                                $.ajax({
+                                    type: "DELETE",
+                                    url: `/api/course/${course.id}`, 
+                                    success: function(response) {
+                                        alert(response.msg);
+                                        callingcourse();
+                                    },
+                                    error: function(error) {
+                                        console.error('Error:', error);
+                                    }
+                                });
+                            });
+
+
+                        });
+                    }
+                });
+            }
+
+            callingcourse();
+        });
+    </script>
 @endsection

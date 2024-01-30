@@ -12,7 +12,7 @@ class CourseController extends Controller
      */
     public function index()
     {
-        return response()->json(["data" => Course::all()]);
+        return response()->json(["data" => Course::with("category")->get()]);
     }
 
     /**
